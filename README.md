@@ -10,4 +10,5 @@ Deep Learning Specialization (Intermediate level): 1- Neural Networks and Deep L
 
 ![Vectorized implementation](VectorizedImplementation.png)
 
+![Feedfarward and backward Propaagation](ForwardBackwardPropagation.png)
 
