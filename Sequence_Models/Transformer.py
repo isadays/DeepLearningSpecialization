@@ -137,3 +137,40 @@ def evaluate_by_month(model, df, date_col, cat_cols, cont_cols, target_col):
 
 # performance_by_month = evaluate_by_month(model, df, date_col, cat_cols, cont_cols, target_col)
 # print(performance_by_month)
+
+
+# Full Transformer Architecture (Encoder-Decoder) for Sequence-to-Sequence tasks
+class FullTransformer(nn.Module):
+    def __init__(self, input_dim, hidden_dim, num_heads, num_layers, dropout=0.1, output_dim=1):
+        super(FullTransformer, self).__init__()
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=input_dim,
+            nhead=num_heads,
+            dim_feedforward=hidden_dim,
+            dropout=dropout,
+            activation='relu'
+        )
+        decoder_layer = nn.TransformerDecoderLayer(
+            d_model=input_dim,
+            nhead=num_heads,
+            dim_feedforward=hidden_dim,
+            dropout=dropout,
+            activation='relu'
+        )
+
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+        self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
+        self.fc_out = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim, output_dim),
+            nn.Sigmoid()
+        )
+
+    def forward(self, src, tgt):
+        memory = self.transformer_encoder(src)
+        output = self.transformer_decoder(tgt, memory)
+        output = output.mean(dim=1)  # Aggregate sequence dimension
+        out = self.fc_out(output)
+        return out
